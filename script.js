@@ -156,29 +156,70 @@
     const glowOpacity = easeOut(lidProgress) * 0.8;
     wrapper.style.setProperty('--screen-glow', glowOpacity);
 
-    // Scale phases:
+    // Responsive laptop scaling, positioning and opacity
+    const isMobile = window.innerWidth <= 900;
     let laptopScale;
-    if (progress < P.scaleUpEnd) {
-      const t = mapRange(progress, 0, P.scaleUpEnd, 0, 1);
-      laptopScale = lerp(0.75, 1.3, easeOut(t));
-    } else if (progress < P.shrinkStart) {
-      laptopScale = 1.3;
+    let laptopY;
+    let laptopX;
+    let laptopOpacity = 1;
+
+    if (isMobile) {
+      // ── MOBILE TRANSFORMS ──────────────────────────────
+      laptopX = 0; // Always centered horizontally
+
+      if (progress < P.scaleUpEnd) {
+        // Hero to Skills: scale up and center vertically
+        const t = mapRange(progress, 0, P.scaleUpEnd, 0, 1);
+        laptopScale = lerp(0.65, 0.95, easeOut(t));
+        laptopY = lerp(40, -10, easeOut(t));
+        laptopOpacity = 1;
+      } else if (progress < P.shrinkStart) {
+        // Active Skills: keep centered and fully visible
+        laptopScale = 0.95;
+        laptopY = -10;
+        laptopOpacity = 1;
+      } else if (progress < P.journeyStart) {
+        // Transition to Journey: slide down and fade out
+        const t = mapRange(progress, P.shrinkStart, P.journeyStart, 0, 1);
+        laptopScale = lerp(0.95, 0, easeInOut(t));
+        laptopY = lerp(-10, 40, easeInOut(t));
+        laptopOpacity = lerp(1, 0, easeOut(t));
+      } else if (progress < P.contactStart) {
+        // Journey: completely hidden to give full room to timeline reading
+        laptopScale = 0;
+        laptopY = 40;
+        laptopOpacity = 0;
+      } else {
+        // Transition and Active Contact: slide up and fade in at the top
+        const t = mapRange(progress, P.contactStart, P.journeyEnd, 0, 1);
+        const easeT = easeOut(t);
+        laptopScale = lerp(0, 0.85, easeT);
+        laptopY = lerp(40, -130, easeT);
+        laptopOpacity = lerp(0, 1, easeT);
+      }
     } else {
-      const t = mapRange(progress, P.shrinkStart, P.shrinkEnd, 0, 1);
-      laptopScale = lerp(1.3, 1.0, easeInOut(t));
+      // ── DESKTOP TRANSFORMS ─────────────────────────────
+      if (progress < P.scaleUpEnd) {
+        const t = mapRange(progress, 0, P.scaleUpEnd, 0, 1);
+        laptopScale = lerp(0.75, 1.3, easeOut(t));
+      } else if (progress < P.shrinkStart) {
+        laptopScale = 1.3;
+      } else {
+        const t = mapRange(progress, P.shrinkStart, P.shrinkEnd, 0, 1);
+        laptopScale = lerp(1.3, 1.0, easeInOut(t));
+      }
+
+      // Smooth vertical translate lerp
+      const yProgress = mapRange(progress, 0, P.scaleUpEnd, 0, 1);
+      laptopY = lerp(40, -10, easeOut(yProgress));
+
+      // X position: center → right
+      const xProgress = mapRange(progress, P.laptopRight, P.laptopRight + 0.08, 0, 1);
+      const vw = window.innerWidth;
+      laptopX = lerp(0, vw * 0.22, easeOut(xProgress));
+      
+      laptopOpacity = 1;
     }
-
-    // Smooth laptop vertical translate lerp
-    const yProgress = mapRange(progress, 0, P.scaleUpEnd, 0, 1);
-    const laptopY = lerp(40, -10, easeOut(yProgress));
-
-    // X position: center → right (after code scroll)
-    const xProgress = mapRange(progress, P.laptopRight, P.laptopRight + 0.08, 0, 1);
-    const vw = window.innerWidth;
-    const laptopX = lerp(0, vw * 0.22, easeOut(xProgress));
-
-    // Opacity: keep laptop always visible on desk
-    const laptopOpacity = 1;
 
     // Apply
     wrapper.style.setProperty('--lx', laptopX + 'px');

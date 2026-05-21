@@ -1011,6 +1011,10 @@ a:hover { color: var(--accent-cyan); }
     flex-direction: column;
   }
 
+  .contact-inner {
+    padding-top: 240px !important;
+  }
+
   .skills-left,
   .journey-left,
   .contact-left {
