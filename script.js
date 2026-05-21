@@ -14,13 +14,10 @@
   const heroContent    = document.getElementById('heroContent');
   const journeyLeft    = document.getElementById('journeyLeft');
   const contactLeft    = document.getElementById('contactLeft');
-  const outroContent   = document.getElementById('outroContent');
   const floatSymbols   = document.querySelectorAll('.float-sym');
 
   // Desk Environment refs
   const deskSurface    = document.querySelector('.desk-surface');
-  const deskPlant      = document.querySelector('.desk-plant');
-  const deskRightProps = document.querySelector('.desk-right-props');
 
   // ── Helpers ───────────────────────────────────────
   function lerp(a, b, t) {
@@ -65,15 +62,11 @@
 
     // Journey
     journeyStart:     0.38,
-    journeyEnd:       0.60,
+    journeyEnd:       0.74,
 
-    // Contact
-    contactStart:     0.58,
-    contactEnd:       0.86,    // stays visible longer (from 0.78)
-
-    // Outro
-    outroStart:       0.84,    // delayed (from 0.76)
-    laptopFade:       0.88,    // delayed (from 0.80)
+    // Contact (Final section)
+    contactStart:     0.70,
+    contactEnd:       1.00,    // remains visible until the bottom of the page
   };
 
   // Total pixels to scroll the code content inside the screen (calculated dynamically)
@@ -133,16 +126,9 @@
     const zoomT = mapRange(progress, 0, P.scaleUpEnd, 0, 1);
     const zoomEase = easeOut(zoomT);
 
-    // Parallax zooms and offsets for individual props
+    // Parallax zooms and offsets for the desk surface
     const dsTy = lerp(0, 60, zoomEase);
     const dsS  = lerp(1, 1.25, zoomEase);
-
-    let dpScale  = lerp(1, 1.35, zoomEase);
-    let dpTx     = lerp(0, -90, zoomEase);
-
-    let drpScale = lerp(1, 1.35, zoomEase);
-    let drpTx    = lerp(0, 90, zoomEase);
-
     let dsTx = 0;
 
     // Slide/pan background elements when laptop moves to the right
@@ -151,21 +137,11 @@
       const shiftEase = easeOut(shiftT);
       const panTx = lerp(0, window.innerWidth * 0.08, shiftEase);
       
-      dpTx     += panTx * 0.8;
-      drpTx    += panTx * 0.8;
       dsTx     += panTx * 0.4;
     }
 
     if (deskSurface) {
       deskSurface.style.setProperty('transform', `translateY(${dsTy}px) scale(${dsS}) translateX(${dsTx}px)`);
-    }
-    if (deskPlant) {
-      deskPlant.style.setProperty('--dp-scale', dpScale);
-      deskPlant.style.setProperty('--dp-tx', dpTx + 'px');
-    }
-    if (deskRightProps) {
-      deskRightProps.style.setProperty('--drp-scale', drpScale);
-      deskRightProps.style.setProperty('--drp-tx', drpTx + 'px');
     }
 
     // ══════════════════════════════════════════════════
@@ -201,9 +177,8 @@
     const vw = window.innerWidth;
     const laptopX = lerp(0, vw * 0.22, easeOut(xProgress));
 
-    // Opacity: fade out at outro
-    const fadeProgress = mapRange(progress, P.laptopFade, P.laptopFade + 0.08, 0, 1);
-    const laptopOpacity = lerp(1, 0, easeOut(fadeProgress));
+    // Opacity: keep laptop always visible on desk
+    const laptopOpacity = 1;
 
     // Apply
     wrapper.style.setProperty('--lx', laptopX + 'px');
@@ -227,9 +202,9 @@
     const screenPanel = document.getElementById('screenPanel');
     const screenMail = document.getElementById('screenMail');
     
-    // Switch to email composer when the contact section reaches the center of the viewport (progress >= 0.62)
-    // and stays until contactEnd
-    if (progress >= 0.62 && progress < P.contactEnd) {
+    // Switch to email composer when the contact section reaches the center of the viewport (progress >= 0.74)
+    // and stays until the bottom of the page
+    if (progress >= 0.74 && progress < P.contactEnd) {
       if (screenMail && !screenMail.classList.contains('active')) {
         screenMail.classList.add('active');
         if (screenPanel) screenPanel.classList.remove('active');
@@ -261,20 +236,12 @@
       journeyLeft.style.setProperty('--journey-ty', lerp(40, 0, easeOut(journeyIn)) + 'px');
     }
 
-    // Contact
+    // Contact (Final Section: does not fade out)
     const contactIn  = mapRange(progress, P.contactStart, P.contactStart + 0.08, 0, 1);
-    const contactOut = mapRange(progress, P.contactEnd - 0.04, P.contactEnd, 0, 1);
-    const contactOp  = Math.min(easeOut(contactIn), 1 - easeOut(contactOut));
+    const contactOp  = easeOut(contactIn);
     if (contactLeft) {
       contactLeft.style.setProperty('--contact-opacity', Math.max(0, contactOp));
       contactLeft.style.setProperty('--contact-ty', lerp(40, 0, easeOut(contactIn)) + 'px');
-    }
-
-    // Outro
-    const outroIn = mapRange(progress, P.outroStart, P.outroStart + 0.08, 0, 1);
-    if (outroContent) {
-      outroContent.style.setProperty('--outro-opacity', easeOut(outroIn));
-      outroContent.style.setProperty('--outro-ty', lerp(30, 0, easeOut(outroIn)) + 'px');
     }
   }
 
