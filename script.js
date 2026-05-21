@@ -45,27 +45,27 @@
   // ── Scroll phases ─────────────────────────────────
   const P = {
     // Hero
-    heroEnd:          0.07,
+    heroEnd:          0.06,
 
     // Laptop opens & scales up
-    laptopOpen:       0.12,    // lid fully open
-    scaleUpEnd:       0.14,    // laptop at max size (1.3)
+    laptopOpen:       0.10,    // lid fully open
+    scaleUpEnd:       0.12,    // laptop at max size (1.3)
 
     // Code scrolls inside screen (const developer → competenze)
-    codeScrollStart:  0.14,
-    codeScrollEnd:    0.36,
+    codeScrollStart:  0.12,
+    codeScrollEnd:    0.52,    // extended to 0.52 (40% of the entire page scroll!)
 
     // Laptop shrinks back & moves right
-    shrinkStart:      0.34,
-    shrinkEnd:        0.40,
-    laptopRight:      0.38,
+    shrinkStart:      0.50,    // starts shrinking near the end of the code scroll
+    shrinkEnd:        0.58,
+    laptopRight:      0.56,
 
     // Journey
-    journeyStart:     0.38,
-    journeyEnd:       0.74,
+    journeyStart:     0.56,
+    journeyEnd:       0.84,    // extended to give a massive, comfortable reading window for journey too!
 
     // Contact (Final section)
-    contactStart:     0.70,
+    contactStart:     0.80,
     contactEnd:       1.00,    // remains visible until the bottom of the page
   };
 
@@ -202,9 +202,9 @@
     const screenPanel = document.getElementById('screenPanel');
     const screenMail = document.getElementById('screenMail');
     
-    // Switch to email composer when the contact section reaches the center of the viewport (progress >= 0.74)
-    // and stays until the bottom of the page
-    if (progress >= 0.74 && progress < P.contactEnd) {
+    // Switch to email composer when the contact section is active (progress >= P.journeyEnd)
+    // and stays active all the way to the bottom of the page
+    if (progress >= P.journeyEnd) {
       if (screenMail && !screenMail.classList.contains('active')) {
         screenMail.classList.add('active');
         if (screenPanel) screenPanel.classList.remove('active');

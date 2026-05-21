@@ -665,7 +665,7 @@ a:hover { color: var(--accent-cyan); }
 
 /* ── SKILLS ──────────────────────────────────────────── */
 .section-skills {
-  min-height: 120vh;
+  min-height: 240vh;
 }
 
 .skills-inner {
@@ -890,6 +890,9 @@ a:hover { color: var(--accent-cyan); }
 }
 
 .contact-left {
+  position: sticky;
+  top: calc(50vh - 160px); /* Aligns perfectly with the top of the laptop screen bezel */
+  align-self: flex-start;
   flex: 1;
   max-width: 560px;
   opacity: var(--contact-opacity, 0);
@@ -1012,6 +1015,11 @@ a:hover { color: var(--accent-cyan); }
   .journey-left,
   .contact-left {
     max-width: 100%;
+  }
+
+  .contact-left {
+    position: relative;
+    top: auto;
   }
 
   .skills-right {
